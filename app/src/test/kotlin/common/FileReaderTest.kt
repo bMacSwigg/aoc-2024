@@ -3,7 +3,7 @@ package common
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class AppTest {
+class FileReaderTest {
     @Test fun loadsFileLines() {
         val classUnderTest = FileReader()
 
