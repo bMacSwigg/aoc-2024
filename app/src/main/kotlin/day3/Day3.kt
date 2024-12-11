@@ -5,7 +5,6 @@ import common.FileReader
 class ProgramReader(fileReader: FileReader, filename: String) {
 
     companion object {
-        val F = """(?:(.*)don't\(\).*){1}(?:do\(\)(.*)don't\(\).*)*(?:do\(\)(.*)){1}"""
         val DO_REGEX = Regex("""do\(\)(.*)""", RegexOption.DOT_MATCHES_ALL)
         val DONT_REGEX = Regex("""(.*?)don't\(\)(.*)""", RegexOption.DOT_MATCHES_ALL)
         val MUL_INSTRUCTION_REGEX = Regex("""mul\((\d{1,3}),(\d{1,3})\)""")
