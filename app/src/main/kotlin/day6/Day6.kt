@@ -77,7 +77,7 @@ class Board(
 
     fun moveOne(): Board? {
         val nextPos = guard + dir
-        if (nextPos.x >= width || nextPos.x < 0 || nextPos.y >= height || nextPos.y < 0) {
+        if (!nextPos.inBounds(width, height)) {
             // Gone off the edge of the board
             throw OutOfBoundsException()
         }
