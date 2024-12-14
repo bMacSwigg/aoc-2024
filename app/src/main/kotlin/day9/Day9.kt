@@ -2,8 +2,6 @@ package day9
 
 import com.google.common.base.Stopwatch
 import common.FileReader
-import java.util.LinkedList
-import kotlin.math.abs
 
 class BruteChecksum(diskMap: List<Int>) {
     private val blocks: MutableList<Int> = mutableListOf()
