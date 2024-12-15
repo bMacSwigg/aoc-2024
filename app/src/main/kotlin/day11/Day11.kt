@@ -1,4 +1,4 @@
-package day11.kt
+package day11
 
 import com.google.common.base.Stopwatch
 import common.FileReader
