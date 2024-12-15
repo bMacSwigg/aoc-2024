@@ -4,7 +4,7 @@ import com.google.common.base.Stopwatch
 import common.FileReader
 import common.Point
 
-data class Cell(val p: Point, val perimeter: Int)
+data class Cell(val p: Point, val edges: List<Point>)
 
 data class Region(val plotType: Char, val cells: MutableList<Cell>) {
 
@@ -17,7 +17,7 @@ data class Region(val plotType: Char, val cells: MutableList<Cell>) {
     }
 
     private fun perimeter(): Int {
-        return cells.sumOf { it.perimeter }
+        return cells.sumOf { it.edges.size }
     }
 
     private fun area(): Int {
@@ -26,6 +26,92 @@ data class Region(val plotType: Char, val cells: MutableList<Cell>) {
 
     fun cost(): Long {
         return perimeter().toLong() * area().toLong()
+    }
+
+    fun sideCost(): Long {
+        val counter = RegionSideCounter(this)
+        return counter.countSides().toLong() * area().toLong()
+    }
+}
+
+data class Side(val dir: Point, val points: MutableList<Point>) {
+
+    fun add(p: Point) {
+        points.add(p)
+    }
+
+    fun merge(other: Side) {
+        if (dir != other.dir) throw IllegalArgumentException()
+        points.addAll(other.points)
+    }
+}
+
+class RegionSideCounter(private val r: Region) {
+    // wow I hate this data structure... oof.
+    // it's a map from a pair of (coords on map, direction) to a Side
+    // in other words, "at [x, y] and to the Point.LEFT"
+    private var sidesMap: MutableMap<Pair<Point, Point>, Side> = mutableMapOf()
+    private val sides: MutableSet<Side> = mutableSetOf()
+
+    init {
+        for (c in r.cells) {
+            for (dir in c.edges) {
+                when(dir) {
+                    Point.LEFT -> processLeftEdge(c)
+                    Point.UP -> processUpEdge(c)
+                    Point.RIGHT -> processRightEdge(c)
+                    Point.DOWN -> processDownEdge(c)
+                }
+            }
+        }
+    }
+
+    fun countSides(): Int {
+        return sides.size
+    }
+
+    private fun processLeftEdge(c: Cell) {
+        val below = r.cells.find { it.p == (c.p + Point.DOWN) }
+        val above = r.cells.find { it.p == (c.p + Point.UP) }
+        processEdge(c, Point.LEFT, below, above)
+    }
+
+    private fun processUpEdge(c: Cell) {
+        val left = r.cells.find { it.p == (c.p + Point.LEFT) }
+        val right = r.cells.find { it.p == (c.p + Point.RIGHT) }
+        processEdge(c, Point.UP, left, right)
+    }
+    private fun processRightEdge(c: Cell) {
+        val above = r.cells.find { it.p == (c.p + Point.UP) }
+        val below = r.cells.find { it.p == (c.p + Point.DOWN) }
+        processEdge(c, Point.RIGHT, above, below)
+    }
+    private fun processDownEdge(c: Cell) {
+        val right = r.cells.find { it.p == (c.p + Point.RIGHT) }
+        val left = r.cells.find { it.p == (c.p + Point.LEFT) }
+        processEdge(c, Point.DOWN, right, left)
+    }
+
+    private fun processEdge(c: Cell, dir: Point, adj1: Cell?, adj2: Cell?) {
+        val side1 = sidesMap[Pair(adj1?.p, dir)]
+        val side2 = sidesMap[Pair(adj2?.p, dir)]
+
+        if (side1 != null) {
+            side1.add(c.p)
+            sidesMap[Pair(c.p, dir)] = side1
+            if (side2 != null) {
+                side1.merge(side2)
+                sidesMap.replaceAll { _, side -> if (side == side2) side1 else side }
+                sides.removeIf { side2 == it }
+            }
+        } else if (side2 != null) {
+            side2.add(c.p)
+            sidesMap[Pair(c.p, dir)] = side2
+        } else {
+            val side = Side(dir, mutableListOf(c.p))
+            sidesMap[Pair(c.p, dir)] = side
+            sides.add(side)
+        }
     }
 }
 
@@ -53,18 +139,18 @@ class FarmMap(private val plots: Array<CharArray>) {
 
     private fun cell(p: Point): Cell {
         val plotType = plotType(p)
-        var perimeter = 0
+        val perimeter = mutableListOf<Point>()
         if (plotType != plotType(p + Point.UP)) {
-            perimeter++
+            perimeter += Point.UP
         }
         if (plotType != plotType(p + Point.RIGHT)) {
-            perimeter++
+            perimeter += Point.RIGHT
         }
         if (plotType != plotType(p + Point.DOWN)) {
-            perimeter++
+            perimeter += Point.DOWN
         }
         if (plotType != plotType(p + Point.LEFT)) {
-            perimeter++
+            perimeter += Point.LEFT
         }
         return Cell(p, perimeter)
     }
@@ -113,6 +199,10 @@ class FarmMap(private val plots: Array<CharArray>) {
     fun totalCost(): Long {
         return regions.sumOf { it.cost() }
     }
+
+    fun totalSideCost(): Long {
+        return regions.sumOf { it.sideCost() }
+    }
 }
 
 class FarmReader(fileReader: FileReader, filename: String) {
@@ -123,9 +213,16 @@ class FarmReader(fileReader: FileReader, filename: String) {
             .toTypedArray()
     private val farmMap = FarmMap(plots)
 
-    fun totalCost(): Long {
+    init {
         farmMap.populateRegions()
+    }
+
+    fun totalCost(): Long {
         return farmMap.totalCost()
+    }
+
+    fun totalSideCost(): Long {
+        return farmMap.totalSideCost()
     }
 }
 
@@ -133,5 +230,6 @@ fun main() {
     val sw = Stopwatch.createStarted()
     val farmReader = FarmReader(FileReader(), "day12.txt")
     println(farmReader.totalCost())
+    println(farmReader.totalSideCost())
     println(sw.stop().elapsed())
 }
