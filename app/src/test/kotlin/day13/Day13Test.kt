@@ -20,4 +20,12 @@ class Day13Test {
 
         assertEquals(480, actual)
     }
+
+    @Test fun sumSolutionsWithOffset() {
+        val classUnderTest = EquationsReader(FileReader(), "day13-example.txt")
+
+        val actual = classUnderTest.sumSolutionsWithOffset(10000000000000L)
+
+        assertEquals(875318608908, actual)
+    }
 }

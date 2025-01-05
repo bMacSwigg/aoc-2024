@@ -40,9 +40,9 @@ class MatrixTest {
 
     @Test fun timesVector() {
         val mat = Matrix(Rational.ofInt(1), Rational.ofInt(3), Rational.ofInt(4), Rational.ofInt(0))
-        val vec = Pair(1, 5)
+        val vec = Pair(1L, 5L)
 
-        val actual = mat.timesIntVector(vec)
+        val actual = mat.timesLongVector(vec)
 
         val expected = Pair(Rational.ofInt(16), Rational.ofInt(4))
         assertEquals(expected, actual)

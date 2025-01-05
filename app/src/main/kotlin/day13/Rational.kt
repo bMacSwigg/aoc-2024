@@ -31,7 +31,11 @@ data class Rational private constructor(val num: Long, val den: Long) {
         }
 
         fun ofInt(a: Int): Rational {
-            return Rational(a.toLong(), 1)
+            return ofLong(a.toLong())
+        }
+
+        fun ofLong(a: Long): Rational {
+            return Rational(a, 1)
         }
 
         val ZERO: Rational = ofInt(0)

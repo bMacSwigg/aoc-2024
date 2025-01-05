@@ -4,9 +4,9 @@ import com.google.common.base.Stopwatch
 import common.FileReader
 
 
-class Equation(private val matrix: Matrix, private val prize: Pair<Int, Int>) {
+class Equation(val matrix: Matrix, val prize: Pair<Long, Long>) {
 
-    fun solution(): Pair<Int, Int> {
+    fun solution(): Pair<Long, Long> {
         // println(this)
 
         if (matrix.determinant() == Rational.ZERO) {
@@ -15,11 +15,11 @@ class Equation(private val matrix: Matrix, private val prize: Pair<Int, Int>) {
             println("WARNING: Gotta deal with this")
             return Pair(0, 0)
         } else {
-            val result = matrix.inverse().timesIntVector(prize)
+            val result = matrix.inverse().timesLongVector(prize)
             if (result.first.isInt() && result.second.isInt()) {
                 // solution is unique
                 // println("SOLUTION: $result")
-                return Pair(result.first.num.toInt(), result.second.num.toInt())
+                return Pair(result.first.num, result.second.num)
             }
             // not an integer solution, so not possible
             // println("NO SOLUTION")
@@ -27,11 +27,11 @@ class Equation(private val matrix: Matrix, private val prize: Pair<Int, Int>) {
         }
     }
 
-    fun bruteForce(): Pair<Int, Int> {
-        for (a in 1..100) {
-            for (b in 1..100) {
-                val res = matrix.timesIntVector(Pair(a, b))
-                if (res.first.num.toInt() == prize.first && res.second.num.toInt() == prize.second) {
+    fun bruteForce(): Pair<Long, Long> {
+        for (a in 1L..100L) {
+            for (b in 1L..100L) {
+                val res = matrix.timesLongVector(Pair(a, b))
+                if (res.first.num == prize.first && res.second.num == prize.second) {
                     return Pair(a, b)
                 }
             }
@@ -63,7 +63,7 @@ class EquationsReader(fileReader: FileReader, filename: String) {
             val px = match.groups["px"]!!.value.toInt()
             val py = match.groups["py"]!!.value.toInt()
             val mat = Matrix(Rational.ofInt(ax), Rational.ofInt(bx), Rational.ofInt(ay), Rational.ofInt(by))
-            val prize = Pair(px, py)
+            val prize = Pair(px.toLong(), py.toLong())
             return Equation(mat, prize)
         }
     }
@@ -89,6 +89,11 @@ class EquationsReader(fileReader: FileReader, filename: String) {
             }
         }
     }
+
+    fun sumSolutionsWithOffset(offset: Long): Long {
+        val newEquations = equations.map { Equation(it.matrix, it.prize.copy(it.prize.first + offset, it.prize.second + offset)) }
+        return newEquations.map { it.solution() }.sumOf { it.first * 3L + it.second }
+    }
 }
 
 fun main() {
@@ -97,5 +102,6 @@ fun main() {
     println("\nTOTAL: ${equationsReader.sumSolutions()}")
     println("\nTOTAL: ${equationsReader.sumSolutionsBruteForce()}")
     equationsReader.checkMismatch()
+    println(equationsReader.sumSolutionsWithOffset(10000000000000L))
     println(sw.stop().elapsed())
 }

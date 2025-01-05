@@ -25,8 +25,8 @@ data class Matrix(val a: Rational, val b: Rational,
         )
     }
 
-    fun timesIntVector(v: Pair<Int, Int>): Pair<Rational, Rational> {
-        return timesVector(Pair(Rational.ofInt(v.first), Rational.ofInt(v.second)))
+    fun timesLongVector(v: Pair<Long, Long>): Pair<Rational, Rational> {
+        return timesVector(Pair(Rational.ofLong(v.first), Rational.ofLong(v.second)))
     }
 
     fun determinant(): Rational {
