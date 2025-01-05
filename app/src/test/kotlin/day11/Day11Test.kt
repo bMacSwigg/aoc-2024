@@ -1,7 +1,6 @@
 package day11
 
 import common.FileReader
-import day11.kt.StoneReader
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
