@@ -204,10 +204,6 @@ class BiggerWarehouse(inputBoard: Array<CharArray>) {
 
 class InputReader(fileReader: FileReader, filename: String) {
 
-    companion object {
-        val ROBOT_REGEX = Regex("""p=(?<px>\d+),(?<py>\d+) v=(?<vx>-?\d+),(?<vy>-?\d+)""")
-    }
-
     private val lines = fileReader.readFileLines(filename)
     val board = lines.subList(0, lines.indexOf("")).map { it.toCharArray() }.toTypedArray()
     val warehouse = Warehouse(board)
