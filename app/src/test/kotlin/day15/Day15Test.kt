@@ -22,4 +22,13 @@ class Day15Test {
 
         assertEquals(10092, actual)
     }
+
+    @Test fun biggerWarehouse_sumGps() {
+        val classUnderTest = InputReader(FileReader(), "day15-example.txt")
+
+        classUnderTest.runBiggerCommands()
+        val actual = classUnderTest.biggerWarehouse.sumGps()
+
+        assertEquals(9021, actual)
+    }
 }
