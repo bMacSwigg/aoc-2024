@@ -21,4 +21,12 @@ class Day17Test {
 
         assertEquals(117_440, actual)
     }
+
+    @Test fun smarter() {
+        val classUnderTest = InputReader(FileReader(), "day17-example2.txt")
+
+        val actual = classUnderTest.smarter()
+
+        assertEquals(117_440, actual)
+    }
 }
