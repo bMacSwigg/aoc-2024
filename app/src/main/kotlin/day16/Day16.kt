@@ -3,8 +3,6 @@ package day16
 import com.google.common.base.Stopwatch
 import common.FileReader
 import common.Point
-import java.lang.IllegalArgumentException
-import java.lang.IllegalStateException
 import java.util.PriorityQueue
 
 
@@ -28,7 +26,7 @@ data class Node(val loc: Point, val dir: Point) {
     }
 }
 
-class Step(val target: Node, val distance: Int): Comparable<Step> {
+class Step(val source: Node, val target: Node, val distance: Int): Comparable<Step> {
     override fun compareTo(other: Step): Int {
         return distance - other.distance
     }
@@ -67,7 +65,7 @@ class Maze(private val board: Array<CharArray>) {
     }
 
     private fun stepDistances(n: Node, d: Int): List<Step> {
-        return validReachable(n).map { Step(it.key, d+it.value) }
+        return validReachable(n).map { Step(n, it.key, d+it.value) }
     }
 
     fun dijkstra(): Int {
@@ -93,6 +91,52 @@ class Maze(private val board: Array<CharArray>) {
         return -1
     }
 
+    fun dijkstraWithBacktrace(): Int {
+        val visited = mutableMapOf<Node, MutableSet<Node>>()
+        val distances = mutableMapOf<Node, Int>()
+        val steps = PriorityQueue<Step>()
+        val backtrace = mutableListOf<Node>()
+
+        distances[Node(start, Point.RIGHT)] = 0
+        steps.addAll(stepDistances(Node(start, Point.RIGHT), 0))
+
+        var dist = Int.MAX_VALUE
+        while (steps.isNotEmpty()) {
+            val s = steps.poll()
+            if (s.distance > dist) {
+                // greater than the distance to the end, implies any further processing
+                // will be wasted on non-optimal paths
+                break
+            }
+
+            if (!visited.contains(s.target)) {
+                visited[s.target] = mutableSetOf(s.source)
+                distances[s.target] = s.distance
+                steps.addAll(stepDistances(s.target, s.distance))
+            } else if (s.distance == distances[s.target]){
+                // Already visited this node, but we might be on an equally-optimal path
+                visited[s.target]!!.add(s.source)
+            }
+
+            if (s.target.loc == end) {
+                dist = s.distance
+                backtrace.add(s.target)
+            }
+        }
+
+        // fill in the board with the optimal paths
+        while (backtrace.isNotEmpty()) {
+            val n = backtrace.removeFirst()
+            set(n.loc, 'O')
+            backtrace.addAll(visited[n]!!)
+            if (n.loc == start) {
+                break
+            }
+        }
+
+        return board.sumOf { it.count { it == 'O' } }
+    }
+
     private fun get(p: Point): Char {
         return board[p.y][p.x]
     }
@@ -116,5 +160,6 @@ fun main() {
     val sw = Stopwatch.createStarted()
     val inputReader = InputReader(FileReader(), "day16.txt")
     println(inputReader.maze.dijkstra())
+    println(inputReader.maze.dijkstraWithBacktrace())
     println(sw.stop().elapsed())
 }

@@ -20,4 +20,20 @@ class Day16Test {
 
         assertEquals(11048, actual)
     }
+
+    @Test fun dijkstraWithBacktrace() {
+        val classUnderTest = InputReader(FileReader(), "day16-example.txt")
+
+        val actual = classUnderTest.maze.dijkstraWithBacktrace()
+
+        assertEquals(45, actual)
+    }
+
+    @Test fun dijkstraWithBacktraceBigger() {
+        val classUnderTest = InputReader(FileReader(), "day16-example-bigger.txt")
+
+        val actual = classUnderTest.maze.dijkstraWithBacktrace()
+
+        assertEquals(64, actual)
+    }
 }
