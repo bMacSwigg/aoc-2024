@@ -13,4 +13,12 @@ class Day18Test {
 
         assertEquals(22, actual)
     }
+
+    @Test fun testReachability() {
+        val classUnderTest = InputReader(FileReader(), "day18-example.txt", 7, 7)
+
+        val actual = classUnderTest.testReachability()
+
+        assertEquals(Pair(6, 1), actual)
+    }
 }

@@ -5,6 +5,7 @@ import common.Board
 import common.FileReader
 import common.Node
 import common.Point
+import java.lang.AssertionError
 
 class InputReader(fileReader: FileReader, filename: String, width: Int, height: Int) {
 
@@ -25,6 +26,15 @@ class InputReader(fileReader: FileReader, filename: String, width: Int, height: 
         }
     }
 
+    fun testReachability(): Pair<Int, Int> {
+        for (loc in coords) {
+            board.set(Point(loc), '#')
+            if (board.dijkstra() == -1) {
+                return loc
+            }
+        }
+        throw AssertionError() // shouldn't be possible, if the input is valid
+    }
 }
 
 fun main() {
@@ -33,5 +43,6 @@ fun main() {
     inputReader.dropBytes(1024)
     println(inputReader.board)
     println(inputReader.board.dijkstra())
+    println(inputReader.testReachability())
     println(sw.stop().elapsed())
 }
