@@ -72,12 +72,13 @@ class Dijkstra(private val board: Board) {
             if (visited.contains(s.target)) {
                 continue
             }
-            if (s.target == board.end) {
-                return s.distance
-            }
             visited.add(s.target)
             distances[s.target] = s.distance
-            steps.addAll(stepDistances(s.target, s.distance))
+            if (s.target == board.end) {
+                return s.distance
+            } else {
+                steps.addAll(stepDistances(s.target, s.distance))
+            }
         }
         return -1
     }
