@@ -65,6 +65,7 @@ class Dijkstra(private val board: Board) {
         distances.clear()
 
         distances[board.start] = 0
+        visited.add(board.start)
         steps.addAll(stepDistances(board.start, 0))
 
         while (steps.isNotEmpty()) {
