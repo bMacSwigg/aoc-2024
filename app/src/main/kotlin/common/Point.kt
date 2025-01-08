@@ -2,6 +2,8 @@ package common
 
 data class Point(val x: Int, val y: Int) {
 
+    constructor(p: Pair<Int, Int>): this(p.first, p.second)
+
     companion object {
         val UP: Point = Point(0, -1)
         val RIGHT: Point = Point(1, 0)
