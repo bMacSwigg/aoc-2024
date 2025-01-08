@@ -1,5 +1,6 @@
 package day18
 
+import common.Dijkstra
 import common.FileReader
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -9,7 +10,7 @@ class Day18Test {
         val classUnderTest = InputReader(FileReader(), "day18-example.txt", 7, 7)
 
         classUnderTest.dropBytes(12)
-        val actual = classUnderTest.board.dijkstra()
+        val actual = Dijkstra(classUnderTest.board).run()
 
         assertEquals(22, actual)
     }
