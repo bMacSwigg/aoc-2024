@@ -1,5 +1,7 @@
 package common
 
+import kotlin.math.abs
+
 data class Point(val x: Int, val y: Int) {
 
     constructor(p: Pair<Int, Int>): this(p.first, p.second)
@@ -21,5 +23,9 @@ data class Point(val x: Int, val y: Int) {
 
     fun inBounds(width: Int, height: Int): Boolean {
         return (x >= 0) && (x < width) && (y >= 0) && (y < height)
+    }
+
+    fun gridDistance(other: Point): Int {
+        return abs(x - other.x) + abs(y - other.y)
     }
 }
