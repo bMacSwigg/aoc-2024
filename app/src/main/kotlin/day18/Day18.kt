@@ -14,7 +14,7 @@ class InputReader(fileReader: FileReader, filename: String, width: Int, height: 
 
     init {
         val tiles = Array(height) { CharArray(width) { '.' } }
-        board = Board(tiles, Node(Point(0, 0)), Node(Point(width-1, height-1)))
+        board = Board(tiles, BasicNode(Point(0, 0)), Point(width-1, height-1))
     }
 
     fun dropBytes(n: Int) {

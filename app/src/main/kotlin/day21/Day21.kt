@@ -5,7 +5,30 @@ import com.google.common.collect.BiMap
 import com.google.common.collect.ImmutableBiMap
 import common.*
 import java.lang.StringBuilder
-import kotlin.math.abs
+
+
+class KeypadTraverser(var pos: Point) {
+
+    fun costTo(other: Point): Int {
+        return -1
+    }
+
+    fun moveTo(other: Point) {
+        pos = other
+    }
+}
+
+data class KeypadNode(override val loc: Point, val prev: Char, val cost: (s: Char, t: Char) -> Int): Node(loc) {
+    override fun reachable(): Map<Node, Int> {
+        val nodes: Map<Node, Int> = mapOf(
+            Pair(KeypadNode(loc+Point.UP, '^', cost), cost(prev, '^')),
+            Pair(KeypadNode(loc+Point.LEFT, '<', cost), cost(prev, '<')),
+            Pair(KeypadNode(loc+Point.DOWN, 'v', cost), cost(prev, 'v')),
+            Pair(KeypadNode(loc+Point.RIGHT, '>', cost), cost(prev, '>')))
+        return nodes
+    }
+
+}
 
 class InputReader(fileReader: FileReader, filename: String) {
 
@@ -33,6 +56,66 @@ class InputReader(fileReader: FileReader, filename: String) {
         numericKeypadBuilder.put('0', Point(1, 3))
         numericKeypadBuilder.put('A', Point(2, 3))
         numericKeypad = numericKeypadBuilder.build()
+    }
+
+    val directionalTiles = arrayOf(
+        charArrayOf('#', '.', '.'),
+        charArrayOf('.', '.', '.')
+    )
+    var numericTiles = arrayOf(
+        charArrayOf('.', '.', '.'),
+        charArrayOf('.', '.', '.'),
+        charArrayOf('.', '.', '.'),
+        charArrayOf('#', '.', '.')
+    )
+
+//    fun costOf(code: String, keypad: Map<Char, Point>, cost: (s: Char, t: Char) -> Int, tiles: Array<CharArray>): Int {
+//        var sum = 0
+//        var start = KeypadNode(keypad['A']!!, 'A', cost)
+//        for (c in code) {
+//            val end = KeypadNode(keypad[c]!!, cost)
+//            sum += Dijkstra(Board(tiles, start, end)).run()
+//            sum += costs['A']!!
+//            start = end
+//        }
+//        return sum
+//    }
+
+    fun costOfNumeric(code: String): Int {
+        var sum = 0
+        var start = 'A'
+        for (c in code) {
+            sum += costOnNumericKeypad(start, c)
+            start = c
+
+        }
+        return sum
+    }
+
+    fun costOnNumericKeypad(s: Char, t: Char): Int {
+        val start = KeypadNode(numericKeypad[s]!!, 'A', this::costOnRadioactiveKeypad)
+        val dijkstra = Dijkstra(Board(numericTiles, start, numericKeypad[t]!!))
+        var cost = dijkstra.run()
+        val endNode = dijkstra.endNode!! as KeypadNode
+        cost += costOnRadioactiveKeypad(endNode.prev, 'A')
+        println("$s -> $t: $cost, ${endNode.prev}")
+        return cost
+    }
+
+    fun costOnRadioactiveKeypad(s: Char, t: Char): Int {
+        val start = KeypadNode(directionalKeypad[s]!!, 'A', this::costOnColdKeypad)
+        val dijkstra = Dijkstra(Board(directionalTiles, start, directionalKeypad[t]!!))
+        var cost = dijkstra.run()
+        if (dijkstra.endNode == null) {
+            println("$s, $t, $cost")
+        }
+        val endNode = dijkstra.endNode!! as KeypadNode
+        cost += costOnColdKeypad(endNode.prev, 'A')
+        return cost
+    }
+
+    fun costOnColdKeypad(s: Char, t: Char): Int {
+        return (directionalKeypad[s]!!.gridDistance(directionalKeypad[t]!!)) + 1
     }
 
     private fun pathBetween(start: Point, end: Point): String {
@@ -67,7 +150,7 @@ class InputReader(fileReader: FileReader, filename: String) {
         return sb.toString()
     }
 
-    private fun fullInstructionsForCode(code: String): String {
+    fun fullInstructionsForCode(code: String): String {
         val iter1 = instructionsForCode(code, numericKeypad)
         val iter2 = instructionsForCode(iter1, directionalKeypad)
         val iter3 = instructionsForCode(iter2, directionalKeypad)
@@ -104,14 +187,54 @@ class InputReader(fileReader: FileReader, filename: String) {
 fun main() {
     val sw = Stopwatch.createStarted()
     val inputReader = InputReader(FileReader(), "day21.txt")
-    // println(inputReader.codesComplexity())
-    println(inputReader.instructionsForCode("379A", inputReader.numericKeypad)) // ^A^^<<A>>AvvvA
-    println(inputReader.simulate("<A>Av<<AA>^AA>AvAA^A<vAAA>^A", inputReader.directionalKeypad))
-    println(inputReader.instructionsForCode("^A^^<<A>>AvvvA", inputReader.directionalKeypad))
-    println(inputReader.simulate("<v<A>>^AvA^A<vA<AA>>^AAvA<^A>AAvA^A<vA>^AA<A>A<v<A>A>^AAAvA<^A>A", inputReader.directionalKeypad))
-    // println(inputReader.instructionsForCode("<A>A<AAv<AA>>^AvAA^Av<AAA>^A", inputReader.directionalKeypad))
-    println(sw.stop().elapsed())
+//    println(inputReader.instructionsForCode("029A", inputReader.numericKeypad))
+//    println(inputReader.instructionsForCode("029A", inputReader.numericKeypad).length)
+//    println(inputReader.costOnColdKeypad('A', 'v')) // 3
+//    println(inputReader.costOnColdKeypad('v', '<')) // 2
+//    println(inputReader.costOnColdKeypad('<', '<')) // 1
+//    println(inputReader.costOnColdKeypad('<', 'A')) // 4
+//    println(inputReader.costOnRadioactiveKeypad('A', '<')) // 10
+//    println(inputReader.costOfNumeric("029A"))
+//    println(inputReader.costOfNumeric("980A"))
+//    println(inputReader.costOfNumeric("179A"))
+//    println(inputReader.costOfNumeric("456A"))
+//    println(inputReader.fullInstructionsForCode("379A"))
+//    println(inputReader.costOfNumeric("379A"))
+//    println(inputReader.simulate("v<<A>>^AvA^A", inputReader.directionalKeypad))
+//    println(inputReader.simulate("<A>A", inputReader.directionalKeypad))
+//    println(inputReader.simulate("^A", inputReader.numericKeypad))
+    println(inputReader.simulate("v<<A>>^AAv<A<A>>^AAvAA^<A>A", inputReader.directionalKeypad))
+    println(inputReader.simulate("<AAv<AA>>^A", inputReader.directionalKeypad))
+    println(inputReader.simulate("^A^^<<A", inputReader.numericKeypad))
+    println(inputReader.simulate("<vA<AA>>^AAvA<^A>AAvA^A", inputReader.directionalKeypad))
+    println(inputReader.simulate("v<<AA>^AA>A", inputReader.directionalKeypad))
+    println(inputReader.simulate("^A<<^^A", inputReader.numericKeypad))
+    println(inputReader.costOnNumericKeypad('3', '7'))
+    println(inputReader.costOfNumeric("37"))
+    var sum = 0
+    var s = 'A'
+    for (c in "<<^^A") {
+        val cost = inputReader.costOnRadioactiveKeypad(s, c)
+        println("$s -> $c: $cost")
+        s = c
+        sum += cost
+    }
+    println("$sum")
+
+    sum = 0
+    s = 'A'
+    for (c in "^^<<A") {
+        val cost = inputReader.costOnRadioactiveKeypad(s, c)
+        println("$s -> $c: $cost")
+        s = c
+        sum += cost
+    }
+    println("$sum")
 }
 
 // v<<A>>^AvA^Av<<A>>^AAv<A<A>>^AAvAA^<A>Av<A>^AA<A>Av<A<A>>^AAAvA^<A>A
 // <v<A>>^AvA^A<vA<AA>>^AAvA<^A>AAvA^A<vA>^AA<A>A<v<A>A>^AAAvA<^A>A
+
+// <A>A<AAv<AA>>^AvAA^Av<AAA>^A
+// 4422441324121323312232411232
+//       *   * *

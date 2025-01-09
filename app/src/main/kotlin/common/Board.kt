@@ -4,18 +4,18 @@ import java.lang.IllegalArgumentException
 import java.util.PriorityQueue
 
 
-class Board(private val tiles: Array<CharArray>, val start: Node, val end: Node) {
+class Board(private val tiles: Array<CharArray>, val start: Node, val end: Point) {
     companion object {
         fun fromText(lines: List<String>): Board {
             val tiles = lines.map { it.toCharArray() }.toTypedArray()
             var start: Node? = null
-            var end: Node? = null
+            var end: Point? = null
             outer@ for (y in tiles.indices) {
                 for (x in tiles[0].indices) {
                     if (start == null && tiles[y][x] == 'S') {
-                        start = Node(Point(x, y))
+                        start = BasicNode(Point(x, y))
                     } else if (end == null && tiles[y][x] == 'E') {
-                        end = Node(Point(x, y))
+                        end = Point(x, y)
                     }
                     if (start != null && end != null) {
                         return Board(tiles, start, end)
@@ -41,13 +41,14 @@ class Board(private val tiles: Array<CharArray>, val start: Node, val end: Node)
         return tiles.joinToString("\n") { it.joinToString("") }
     }
 
-    fun copy(): Board {
+    fun copy(start: Node = this.start, end: Point = this.end): Board {
         return Board(tiles.map { it.copyOf() }.toTypedArray(), start, end)
     }
 }
 
 class Dijkstra(private val board: Board) {
     val distances = mutableMapOf<Node, Int>()
+    var endNode: Node? = null
 
     private fun validReachable(n: Node): Map<Node, Int> {
         return n.reachable().filter {
@@ -60,6 +61,11 @@ class Dijkstra(private val board: Board) {
     }
 
     fun run(): Int {
+        if (board.start.loc == board.end) {
+            endNode = board.start
+            return 0
+        }
+
         val visited = mutableSetOf<Node>()
         val steps = PriorityQueue<Step>()
         distances.clear()
@@ -75,7 +81,8 @@ class Dijkstra(private val board: Board) {
             }
             visited.add(s.target)
             distances[s.target] = s.distance
-            if (s.target == board.end) {
+            if (s.target.loc == board.end) {
+                endNode = s.target
                 return s.distance
             } else {
                 steps.addAll(stepDistances(s.target, s.distance))
@@ -85,15 +92,19 @@ class Dijkstra(private val board: Board) {
     }
 }
 
-data class Node(val loc: Point) {
+abstract class Node(open val loc: Point) {
+    abstract fun reachable(): Map<Node, Int>
+}
+
+data class BasicNode(override val loc: Point): Node(loc) {
 
     // all the adjacent nodes -- ignoring maze walls -- and the cost associated with them
-    fun reachable(): Map<Node, Int> {
-        val nodes = mapOf(
-            Pair(Node(loc+Point.UP), 1),
-            Pair(Node(loc+Point.LEFT), 1),
-            Pair(Node(loc+Point.DOWN), 1),
-            Pair(Node(loc+Point.RIGHT), 1))
+    override fun reachable(): Map<Node, Int> {
+        val nodes: Map<Node, Int> = mapOf(
+            Pair(BasicNode(loc+Point.UP), 1),
+            Pair(BasicNode(loc+Point.LEFT), 1),
+            Pair(BasicNode(loc+Point.DOWN), 1),
+            Pair(BasicNode(loc+Point.RIGHT), 1))
         return nodes
     }
 }

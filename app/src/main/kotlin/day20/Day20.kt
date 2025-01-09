@@ -13,7 +13,7 @@ class InputReader(fileReader: FileReader, filename: String) {
         dijkstra.run()
         // need to set these so the adjacency function can work easily
         board.set(board.start.loc, '.')
-        board.set(board.end.loc, '.')
+        board.set(board.end, '.')
     }
 
     private fun freePointsWithinN(p: Point, n: Int): List<Point> {
@@ -40,9 +40,9 @@ class InputReader(fileReader: FileReader, filename: String) {
                 }
                 val endCheats = freePointsWithinN(startCheat, timeLimit)
 
-                val startTime = dijkstra.distances[Node(startCheat)]!!
+                val startTime = dijkstra.distances[BasicNode(startCheat)]!!
                 endCheats.forEach {
-                    val saved = dijkstra.distances[Node(it)]!! - startTime - startCheat.gridDistance(it)
+                    val saved = dijkstra.distances[BasicNode(it)]!! - startTime - startCheat.gridDistance(it)
                     cheats[Pair(startCheat, it)] = saved
                 }
             }
