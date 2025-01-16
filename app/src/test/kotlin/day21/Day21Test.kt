@@ -8,7 +8,7 @@ class Day21Test {
     @Test fun codesComplexity() {
         val classUnderTest = InputReader(FileReader(), "day21-example.txt")
 
-        val actual = classUnderTest.codesComplexity()
+        val actual = classUnderTest.codesComplexity(2)
 
         assertEquals(126384, actual)
     }
