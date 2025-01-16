@@ -1,10 +1,8 @@
 package day21
 
 import com.google.common.base.Stopwatch
-import com.google.common.collect.BiMap
 import com.google.common.collect.ImmutableBiMap
 import common.*
-import java.lang.StringBuilder
 
 
 data class KeypadNode(override val loc: Point, val prev: Char, val cost: (s: Char, t: Char) -> Long): Node(loc) {
@@ -103,7 +101,6 @@ class InputReader(fileReader: FileReader, filename: String) {
             costCache[cacheKey] = cost
             return cost
         }
-
     }
 
     fun costOnColdKeypad(s: Char, t: Char): Long {
@@ -126,7 +123,6 @@ fun main() {
     val sw = Stopwatch.createStarted()
     val inputReader = InputReader(FileReader(), "day21.txt")
     println(inputReader.codesComplexity(2))
-    println(sw.elapsed())
     println(inputReader.codesComplexity(25))
     println(sw.stop().elapsed())
 }
