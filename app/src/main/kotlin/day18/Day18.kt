@@ -26,7 +26,7 @@ class InputReader(fileReader: FileReader, filename: String, width: Int, height: 
     fun testReachability(): Pair<Int, Int> {
         for (loc in coords) {
             board.set(Point(loc), '#')
-            if (Dijkstra(board).run() == -1) {
+            if (Dijkstra(board).run() == -1L) {
                 return loc
             }
         }

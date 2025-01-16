@@ -43,7 +43,7 @@ class InputReader(fileReader: FileReader, filename: String) {
                 val startTime = dijkstra.distances[BasicNode(startCheat)]!!
                 endCheats.forEach {
                     val saved = dijkstra.distances[BasicNode(it)]!! - startTime - startCheat.gridDistance(it)
-                    cheats[Pair(startCheat, it)] = saved
+                    cheats[Pair(startCheat, it)] = saved.toInt()
                 }
             }
         }

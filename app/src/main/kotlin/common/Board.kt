@@ -47,23 +47,23 @@ class Board(private val tiles: Array<CharArray>, val start: Node, val end: Node)
 }
 
 class Dijkstra(private val board: Board) {
-    val distances = mutableMapOf<Node, Int>()
+    val distances = mutableMapOf<Node, Long>()
     var endNode: Node? = null
 
-    private fun validReachable(n: Node): Map<Node, Int> {
+    private fun validReachable(n: Node): Map<Node, Long> {
         return n.reachable().filter {
             it.key.loc.inBounds(board.width, board.height) && board.get(it.key.loc) != '#'
         }
     }
 
-    private fun stepDistances(n: Node, d: Int): List<Step> {
+    private fun stepDistances(n: Node, d: Long): List<Step> {
         return validReachable(n).map { Step(n, it.key, d+it.value) }
     }
 
-    fun run(shortcutCost: Int = 0): Int {
+    fun run(shortcutCost: Int = 0): Long {
         if (board.start == board.end) {
             endNode = board.start
-            return shortcutCost
+            return shortcutCost.toLong()
         }
 
         val visited = mutableSetOf<Node>()
@@ -94,24 +94,24 @@ class Dijkstra(private val board: Board) {
 }
 
 abstract class Node(open val loc: Point) {
-    abstract fun reachable(): Map<Node, Int>
+    abstract fun reachable(): Map<Node, Long>
 }
 
 data class BasicNode(override val loc: Point): Node(loc) {
 
     // all the adjacent nodes -- ignoring maze walls -- and the cost associated with them
-    override fun reachable(): Map<Node, Int> {
-        val nodes: Map<Node, Int> = mapOf(
-            Pair(BasicNode(loc+Point.UP), 1),
-            Pair(BasicNode(loc+Point.LEFT), 1),
-            Pair(BasicNode(loc+Point.DOWN), 1),
-            Pair(BasicNode(loc+Point.RIGHT), 1))
+    override fun reachable(): Map<Node, Long> {
+        val nodes: Map<Node, Long> = mapOf(
+            Pair(BasicNode(loc+Point.UP), 1L),
+            Pair(BasicNode(loc+Point.LEFT), 1L),
+            Pair(BasicNode(loc+Point.DOWN), 1L),
+            Pair(BasicNode(loc+Point.RIGHT), 1L))
         return nodes
     }
 }
 
-class Step(val source: Node, val target: Node, val distance: Int): Comparable<Step> {
+class Step(val source: Node, val target: Node, val distance: Long): Comparable<Step> {
     override fun compareTo(other: Step): Int {
-        return distance - other.distance
+        return distance.compareTo(other.distance)
     }
 }
