@@ -13,7 +13,7 @@ class InputReader(fileReader: FileReader, filename: String) {
         dijkstra.run()
         // need to set these so the adjacency function can work easily
         board.set(board.start.loc, '.')
-        board.set(board.end, '.')
+        board.set(board.end.loc, '.')
     }
 
     private fun freePointsWithinN(p: Point, n: Int): List<Point> {

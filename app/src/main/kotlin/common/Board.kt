@@ -4,18 +4,18 @@ import java.lang.IllegalArgumentException
 import java.util.PriorityQueue
 
 
-class Board(private val tiles: Array<CharArray>, val start: Node, val end: Point) {
+class Board(private val tiles: Array<CharArray>, val start: Node, val end: Node) {
     companion object {
         fun fromText(lines: List<String>): Board {
             val tiles = lines.map { it.toCharArray() }.toTypedArray()
             var start: Node? = null
-            var end: Point? = null
+            var end: Node? = null
             outer@ for (y in tiles.indices) {
                 for (x in tiles[0].indices) {
                     if (start == null && tiles[y][x] == 'S') {
                         start = BasicNode(Point(x, y))
                     } else if (end == null && tiles[y][x] == 'E') {
-                        end = Point(x, y)
+                        end = BasicNode(Point(x, y))
                     }
                     if (start != null && end != null) {
                         return Board(tiles, start, end)
@@ -41,7 +41,7 @@ class Board(private val tiles: Array<CharArray>, val start: Node, val end: Point
         return tiles.joinToString("\n") { it.joinToString("") }
     }
 
-    fun copy(start: Node = this.start, end: Point = this.end): Board {
+    fun copy(start: Node = this.start, end: Node = this.end): Board {
         return Board(tiles.map { it.copyOf() }.toTypedArray(), start, end)
     }
 }
@@ -60,10 +60,10 @@ class Dijkstra(private val board: Board) {
         return validReachable(n).map { Step(n, it.key, d+it.value) }
     }
 
-    fun run(): Int {
-        if (board.start.loc == board.end) {
+    fun run(shortcutCost: Int = 0): Int {
+        if (board.start == board.end) {
             endNode = board.start
-            return 0
+            return shortcutCost
         }
 
         val visited = mutableSetOf<Node>()
@@ -81,7 +81,8 @@ class Dijkstra(private val board: Board) {
             }
             visited.add(s.target)
             distances[s.target] = s.distance
-            if (s.target.loc == board.end) {
+            // TODO: could add a function for '.matches()'
+            if (s.target == board.end) {
                 endNode = s.target
                 return s.distance
             } else {
