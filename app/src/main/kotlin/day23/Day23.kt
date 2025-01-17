@@ -2,34 +2,8 @@ package day23
 
 import com.google.common.base.Stopwatch
 import common.*
+import java.lang.IllegalArgumentException
 
-class CycleFinder(val start: Computer, val length: Int) {
-
-    fun findAll(): Set<Set<String>> {
-        return explore(start, setOf(), length)
-    }
-
-    private fun explore(node: Computer, others: Set<Computer>, depth: Int): Set<Set<String>> {
-        if (depth == 0) {
-            if (node == start) {
-                return setOf(others.map { it.id }.toSet())
-            } else {
-                return setOf()
-            }
-        }
-
-        return node.connections.flatMap { explore(it, others.plus(node), depth-1) }.toSet()
-    }
-}
-
-class Computer(val id: String) {
-
-    val connections = mutableListOf<Computer>()
-
-    fun addConnection(other: Computer) {
-        connections.add(other)
-    }
-}
 
 data class Group(val comps: Set<String>) {
 
@@ -42,31 +16,63 @@ data class Group(val comps: Set<String>) {
 
 class InputReader(fileReader: FileReader, filename: String) {
 
-    val computers = mutableMapOf<String, Computer>()
-    val connections = fileReader.readFileLines(filename).map { it.split('-', limit=2) }
-    val twoGroups = connections.map { Group(it.toSet()) }
+    val computers: Set<String>
+
+    val twoGroups: Set<Group>
 
     init {
-        for (connection in connections) {
-            val comp1 = computers.computeIfAbsent(connection[0]) { k -> Computer(k) }
-            val comp2 = computers.computeIfAbsent(connection[1]) { k -> Computer(k) }
-            comp1.addConnection(comp2)
-            comp2.addConnection(comp1)
+        val connections = fileReader.readFileLines(filename).map { it.split('-', limit=2) }
+        computers = connections.flatten().toSet()
+        twoGroups = connections.map { Group(it.toSet()) }.toSet()
+    }
+
+    fun findAllGroups(size: Int, prev: Set<Group>? = null): Set<Group> {
+        if (size < 2) {
+            throw IllegalArgumentException()
         }
+        if (size == 2) {
+            return twoGroups.toSet()
+        }
+
+        val smallerGroups = prev ?: findAllGroups(size-1)
+        if (smallerGroups.isEmpty()) {
+            return emptySet()
+        }
+
+        val groups = mutableSetOf<Group>()
+        for (comp in computers) {
+            for (g in smallerGroups) {
+                if (g.comps.all { twoGroups.contains(Group(it, comp)) }) {
+                    groups.add(g.add(comp))
+                }
+            }
+        }
+        return groups
     }
 
-    fun findAll3Cycles(): Set<Set<String>> {
-        return computers.values.map { CycleFinder(it, 3) }.flatMap { it.findAll() }.toSet()
+    fun startingWithT(cycles: Set<Group>): List<Group> {
+        return cycles.filter { it.comps.any { it.startsWith('t') } }
     }
 
-    fun startingWithT(cycles: Set<Set<String>>): List<Set<String>> {
-        return cycles.filter { it.any { it.startsWith('t') } }
+    fun password(): String {
+        var groups = findAllGroups(3)
+        for (size in 4..14) {
+            val next = findAllGroups(size, groups)
+            if (next.isEmpty()) {
+                return groups.first().comps.sorted().joinToString(",")
+            } else {
+                groups = next
+            }
+        }
+        // 14 is the largest possible group size, because every node has 13 edges
+        throw AssertionError()
     }
 }
 
 fun main() {
     val sw = Stopwatch.createStarted()
     val inputReader = InputReader(FileReader(), "day23.txt")
-    println(inputReader.startingWithT(inputReader.findAll3Cycles()).size)
+    println(inputReader.startingWithT(inputReader.findAllGroups(3)).size)
+    println(inputReader.password())
     println(sw.stop().elapsed())
 }
