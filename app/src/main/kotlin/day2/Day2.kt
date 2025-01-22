@@ -1,5 +1,6 @@
 package day2
 
+import com.google.common.base.Stopwatch
 import common.FileReader
 import kotlin.math.abs
 
@@ -56,7 +57,9 @@ class ReportReader(fileReader: FileReader, filename: String) {
 }
 
 fun main() {
+    val sw = Stopwatch.createStarted()
     val reportReader = ReportReader(FileReader(), "day2.txt")
     println(reportReader.countSafe())
     println(reportReader.countSafeWithDampener())
+    println(sw.stop().elapsed())
 }

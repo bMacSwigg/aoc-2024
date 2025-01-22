@@ -1,5 +1,6 @@
 package day4
 
+import com.google.common.base.Stopwatch
 import common.FileReader
 
 class WordSearch(lines: List<String>) {
@@ -132,7 +133,9 @@ class BoardReader(fileReader: FileReader, filename: String) {
 }
 
 fun main() {
+    val sw = Stopwatch.createStarted()
     val boardReader = BoardReader(FileReader(), "day4.txt")
     println(boardReader.countXmas())
     println(boardReader.countMasX())
+    println(sw.stop().elapsed())
 }

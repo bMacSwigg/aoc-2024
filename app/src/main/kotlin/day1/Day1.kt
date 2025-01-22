@@ -1,5 +1,6 @@
 package day1
 
+import com.google.common.base.Stopwatch
 import common.FileReader
 import kotlin.math.abs
 
@@ -39,7 +40,9 @@ class ListReader(fileReader: FileReader, filename: String) {
 }
 
 fun main() {
+    val sw = Stopwatch.createStarted()
     val listReader = ListReader(FileReader(), "day1.txt")
     println(listReader.calculateDiff())
     println(listReader.calculateSimilarity())
+    println(sw.stop().elapsed())
 }

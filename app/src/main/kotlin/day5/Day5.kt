@@ -1,5 +1,6 @@
 package day5
 
+import com.google.common.base.Stopwatch
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.Multimap
 import common.FileReader
@@ -76,7 +77,9 @@ class InputReader(fileReader: FileReader, filename: String) {
 }
 
 fun main() {
+    val sw = Stopwatch.createStarted()
     val inputReader = InputReader(FileReader(), "day5.txt")
     println(inputReader.sumValidMiddles())
     println(inputReader.fixAndSumMiddles())
+    println(sw.stop().elapsed())
 }

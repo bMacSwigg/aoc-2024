@@ -1,5 +1,6 @@
 package day3
 
+import com.google.common.base.Stopwatch
 import common.FileReader
 
 class ProgramReader(fileReader: FileReader, filename: String) {
@@ -47,7 +48,9 @@ class ProgramReader(fileReader: FileReader, filename: String) {
 }
 
 fun main() {
+    val sw = Stopwatch.createStarted()
     val programReader = ProgramReader(FileReader(), "day3.txt")
     println(programReader.sum())
     println(programReader.conditionalSum())
+    println(sw.stop().elapsed())
 }

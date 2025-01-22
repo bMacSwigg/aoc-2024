@@ -112,7 +112,7 @@ class InputReader(fileReader: FileReader, filename: String) {
         for (code in codes) {
             val cost = costOfNumeric(layers, code)
             val numeric = code.substring(0, code.length-1).toInt()
-            println("$code: $cost, $numeric")
+            // println("$code: $cost, $numeric")
             sum += cost * numeric
         }
         return sum

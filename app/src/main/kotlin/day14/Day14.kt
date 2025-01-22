@@ -103,6 +103,7 @@ class RobotsReader(fileReader: FileReader, filename: String, private val dims: P
             if (isAnomalous()) {
                 println("ANOMALY AT TIME ${i+start+offset}")
                 println(this)
+                break
             }
         }
         println("Checked up through time ${n+start+offset}")
@@ -118,6 +119,6 @@ fun main() {
     val robotsReader = RobotsReader(FileReader(), "day14.txt", Pair(101L, 103L))
     robotsReader.step(100)
     println(robotsReader.calculateSafetyFactor())
-    robotsReader.printAnomalies(10000, 100, 2500)
+    robotsReader.printAnomalies(10000, 100)
     println(sw.stop().elapsed())
 }

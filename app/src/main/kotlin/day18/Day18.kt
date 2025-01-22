@@ -38,7 +38,7 @@ fun main() {
     val sw = Stopwatch.createStarted()
     val inputReader = InputReader(FileReader(), "day18.txt", 71, 71)
     inputReader.dropBytes(1024)
-    println(inputReader.board)
+    // println(inputReader.board)
     println(Dijkstra(inputReader.board).run())
     println(inputReader.testReachability())
     println(sw.stop().elapsed())

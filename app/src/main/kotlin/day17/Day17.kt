@@ -153,8 +153,8 @@ class InputReader(fileReader: FileReader, filename: String) {
     fun smarter(): Long {
         var possibles = listOf(0L)
         for (i in 1..program.size) {
-            println(possibles.size)
-            println(program.subList(program.size-i, program.size))
+            // println(possibles.size)
+            // println(program.subList(program.size-i, program.size))
             possibles = possibles.map { it shl 3 }
             possibles = possibles.flatMap {
                 try {
@@ -175,9 +175,9 @@ fun main() {
     println(inputReader.computer.getOutput())
     println(inputReader.smarter())
 
-    val comp = Computer(105706277661082, 0, 0, listOf(2,4,1,5,7,5,1,6,0,3,4,3,5,5,3,0))
-    comp.run()
-    println(comp.getOutput())
+    // val comp = Computer(105706277661082, 0, 0, listOf(2,4,1,5,7,5,1,6,0,3,4,3,5,5,3,0))
+    // comp.run()
+    // println(comp.getOutput())
     println(sw.stop().elapsed())
 }
 

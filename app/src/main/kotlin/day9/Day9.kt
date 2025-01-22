@@ -189,7 +189,7 @@ class DiskMapReader(fileReader: FileReader, filename: String) {
 fun main() {
     val sw = Stopwatch.createStarted()
     val diskMapReader = DiskMapReader(FileReader(), "day9.txt")
-    println(diskMapReader.bruteChecksum())
+    // println(diskMapReader.bruteChecksum())
     println(diskMapReader.cleverChecksum())
     println(diskMapReader.fullFileChecksum())
     println(sw.stop().elapsed())

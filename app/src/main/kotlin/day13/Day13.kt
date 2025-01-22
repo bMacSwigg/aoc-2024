@@ -100,8 +100,8 @@ fun main() {
     val sw = Stopwatch.createStarted()
     val equationsReader = EquationsReader(FileReader(), "day13.txt")
     println("\nTOTAL: ${equationsReader.sumSolutions()}")
-    println("\nTOTAL: ${equationsReader.sumSolutionsBruteForce()}")
-    equationsReader.checkMismatch()
+    // println("\nTOTAL: ${equationsReader.sumSolutionsBruteForce()}")
+    // equationsReader.checkMismatch()
     println(equationsReader.sumSolutionsWithOffset(10000000000000L))
     println(sw.stop().elapsed())
 }
